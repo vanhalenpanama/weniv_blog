@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>번개 피하기 게임</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: white;
+        }
+        #gameArea {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background-color: white;
+        }
+        .player {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            width: 50px;
+            height: 50px;
+            background-color: #316879;
+            transform: translateX(-50%);
+        }
+        .obstacle {
+            position: absolute;
+            width: 40px;
+            height: 43px;
+            background-size: cover;
+            background-image: url('img/lightning.jpg');
+        }
+        #timer {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div id="gameArea">
+        <div class="player" id="player"></div>
+        <!-- <div id="timer">0.0s</div> -->
+        <div id="timer">0.000s</div>
+    </div>
+    <script>const gameArea = document.getElementById('gameArea');
+        const player = document.getElementById('player');
+        const timer = document.getElementById('timer');
+        
+        let playerX = window.innerWidth / 2 - 25;
+        const playerSpeed = 10;
+        const playerWidth = 50;
+        let gameOver = false;
+        let startTime = Date.now();
+        
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') {
+                playerX -= playerSpeed;
+                if (playerX < 0) playerX = 0;
+            } else if (e.key === 'ArrowRight') {
+                playerX += playerSpeed;
+                if (playerX > window.innerWidth - playerWidth) playerX = window.innerWidth - playerWidth;
+            }
+            player.style.transform = `translateX(${playerX - (window.innerWidth / 2 - 25)}px)`;
+        });
+        
+        function createObstacle() {
+            const obstacle = document.createElement('div');
+            obstacle.className = 'obstacle';
+            obstacle.style.left = `${Math.random() * (window.innerWidth - 40)}px`; // Adjusted width for obstacle image
+            gameArea.appendChild(obstacle);
+            moveObstacle(obstacle);
+        }
+        
+        function moveObstacle(obstacle) {
+            let obstacleY = 0;
+            const obstacleSpeed = 5;
+            const interval = setInterval(() => {
+                if (gameOver) {
+                    clearInterval(interval);
+                    return;
+                }
+                obstacleY += obstacleSpeed;
+                obstacle.style.top = `${obstacleY}px`;
+                if (obstacleY > window.innerHeight) {
+                    gameArea.removeChild(obstacle);
+                    clearInterval(interval);
+                }
+                if (detectCollision(player, obstacle)) {
+                    gameOver = true;
+                    const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(3);
+                    alert(`게임 오버! 경과 시간: ${elapsedTime}s`);
+                    window.location.reload();
+                }
+            }, 20);
+        }
+        
+        function detectCollision(player, obstacle) {
+            const playerRect = player.getBoundingClientRect();
+            const obstacleRect = obstacle.getBoundingClientRect();
+        
+            return !(
+                playerRect.top > obstacleRect.bottom ||
+                playerRect.bottom < obstacleRect.top ||
+                playerRect.right < obstacleRect.left ||
+                playerRect.left > obstacleRect.right
+            );
+        }
+        
+        function updateTimer() {
+            if (!gameOver) {
+                const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(3);
+                timer.textContent = `${elapsedTime}s`;
+                requestAnimationFrame(updateTimer);
+            }
+        }
+        
+        setInterval(createObstacle, 1000);
+        updateTimer();
+        </script>
+</body>
+</html>
