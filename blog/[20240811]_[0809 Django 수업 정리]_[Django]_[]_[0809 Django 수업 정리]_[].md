@@ -16,6 +16,8 @@ GET 사용자의 상태를 변경하지 않는다. 주 원칙! -> POST요청! PU
 
 시작부터 빡셈
 
+'''python
+
 # 폴더 생성
 DJANGO_MODU_02
 
@@ -1024,4 +1026,7 @@ urlpatterns = [
 {% endfor %}
 </body>
 </html>
+'''
+
+
 '''
