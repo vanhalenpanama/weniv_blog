@@ -1,3 +1,7 @@
+'''
+git config core.autocrlf true
+'''
+
 {% raw %}
 ```python
 
