@@ -1,5 +1,5 @@
 {% raw %}
-```
+```python
 
 python manage.py runserver
 
